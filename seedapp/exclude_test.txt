@@ -1,0 +1,11 @@
+seedapp/scripts/migrations
+seedapp/scripts/seeds
+seedapp/scripts/migrations/tenant
+seedapp/scripts/migrations/main
+seedapp/internal/bootstrap
+seedapp/internal/adapter/repository/mocks
+seedapp/internal/adapter/repository/sqlx/*
+seedapp/internal/adapter/cache/*
+seedapp/internal/domain/migration/mocks
+seedapp/internal/domain/seed/mocks
+seedapp/internal/application/service/mocks

@@ -1,0 +1,63 @@
+package custommiddleware
+
+import (
+	"errors"
+	"strings"
+
+	"userapp/internal/pkg/formatter"
+	"userapp/internal/pkg/validator"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+func ErrorHandler(codeMap map[error]formatter.Status, statusMap map[error]int) fiber.ErrorHandler {
+	return func(c *fiber.Ctx, err error) error {
+		var httpStatus int
+		errList := make(map[string]any, 0)
+		message := err.Error()
+
+		// if error is a validator.ErrorMap
+		if _err, ok := err.(*validator.ErrorMap); ok {
+			message, errList = makeErrorMap(_err.Error())
+			err = fiber.ErrBadRequest
+		}
+
+		// Retrieve the custom status code if it's a *fiber.Error
+		var fiberErr *fiber.Error
+		if errors.As(err, &fiberErr) {
+			httpStatus = fiberErr.Code
+		} else {
+			httpStatus = gethttpstatus(err, statusMap)
+		}
+
+		c.Set(fiber.HeaderContentType, fiber.MIMEApplicationJSON)
+		c.Status(httpStatus)
+
+		code := getcode(err, codeMap)
+		traceID := c.Locals("traceId").(string)
+
+		if len(errList) > 0 {
+			return c.JSON(formatter.NewErrorResponseList(code, message, traceID, errList))
+		}
+
+		return c.JSON(formatter.NewErrorResponse(code, message, traceID))
+	}
+}
+
+func makeErrorMap(er string) (string, map[string]any) {
+	err := make(map[string]any, 0)
+	message := ""
+	errorMsg := strings.Split(er, ";")
+	for _, msg := range errorMsg {
+		errorList := strings.Split(msg, ":")
+
+		message = strings.Join(errorList[1:], ":")
+		if len(errorList) > 2 {
+			err[errorList[0]] = strings.Join(errorList[1:], ":")
+		} else {
+			err[errorList[0]] = errorList[1]
+		}
+	}
+
+	return message, err
+}

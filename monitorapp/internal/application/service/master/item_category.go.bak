@@ -1,0 +1,146 @@
+package service
+
+import (
+	metadata "beru/internal/application/model"
+	model "beru/internal/application/model/master"
+	"beru/internal/domain/master/itemcategory"
+	"beru/internal/domain/shared"
+	"beru/internal/pkg/identity"
+	"context"
+	"strconv"
+	"strings"
+)
+
+//go:generate mockgen -source=item_category.go -destination=mocks/item_category.go -package=mocks
+type ItemCategoryService interface {
+	List(ctx context.Context, filter map[string]interface{}) ([]*model.ListItemCategoryResponse, *metadata.Metadata, error)
+	Create(ctx context.Context, itemCategory *model.CreateItemCategoryRequest) (*itemcategory.ItemCategory, error)
+	GetByID(ctx context.Context, id, schema string) (*model.ItemCategoryResponse, error)
+	Update(ctx context.Context, itemCategory *model.UpdateItemCategoryRequest) (*itemcategory.ItemCategory, error)
+}
+
+type ItemCategory struct {
+	ItemCategoryRepository itemcategory.Repository `inject:"itemCategoryRepository"`
+}
+
+func (s *ItemCategory) List(ctx context.Context, filter map[string]interface{}) ([]*model.ListItemCategoryResponse, *metadata.Metadata, error) {
+	var (
+		limit, offset uint64
+		resp          []*model.ListItemCategoryResponse
+	)
+
+	if _limit, ok := filter["limit"].(uint64); ok && _limit > 0 {
+		limit = _limit
+	}
+
+	if _offset, ok := filter["offset"].(uint64); ok && _offset > 0 {
+		offset = _offset
+	}
+
+	itemCategories, err := s.ItemCategoryRepository.GetAll(ctx, filter)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	for _, itemCategory := range itemCategories {
+		resp = append(resp, &model.ListItemCategoryResponse{
+			Code:   itemCategory.Code,
+			Name:   itemCategory.Name,
+			ActInd: itemCategory.ActInd,
+		})
+	}
+
+	total, err := s.ItemCategoryRepository.Count(ctx, filter)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	metadata := metadata.Metadata{
+		Total:       total,
+		Limit:       limit,
+		Offset:      offset,
+		CurrentPage: (offset / limit) + 1,
+		TotalPages:  (total + limit - 1) / limit,
+	}
+
+	return resp, &metadata, nil
+}
+
+func (s *ItemCategory) Create(ctx context.Context, itemCategory *model.CreateItemCategoryRequest) (*itemcategory.ItemCategory, error) {
+	var (
+		itemCategoryCode string
+		curItemCategory  *itemcategory.ItemCategory
+	)
+
+	itemCategoryName := strings.Fields(itemCategory.Name)
+	if len(itemCategoryName[0]) < 3 {
+		itemCategoryCode = strings.ToUpper(itemCategoryName[0])
+	} else {
+		itemCategoryCode = strings.ToUpper(itemCategoryName[0][:3])
+	}
+
+	lastCode, err := s.ItemCategoryRepository.GetLastCode(ctx, map[string]interface{}{
+		"schema":             itemCategory.Schema,
+		"item_category_code": itemCategoryCode,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	lastCodeInt, err := strconv.Atoi(lastCode)
+	if err != nil {
+		return nil, err
+	}
+
+	generatedCode := curItemCategory.GenerateCode(lastCodeInt)
+	code := itemCategoryCode + generatedCode
+
+	curItemCategory = &itemcategory.ItemCategory{
+		Code:   code,
+		Name:   itemCategory.Name,
+		ActInd: shared.YES.String(),
+		AuditTrail: shared.AuditTrail{
+			CreatedBy: identity.FromStringOrNil(itemCategory.CreatedBy),
+		},
+	}
+
+	err = s.ItemCategoryRepository.Create(ctx, curItemCategory, itemCategory.Schema)
+	if err != nil {
+		return nil, err
+	}
+
+	return curItemCategory, nil
+}
+
+func (s *ItemCategory) Update(ctx context.Context, itemCategory *model.UpdateItemCategoryRequest) (*itemcategory.ItemCategory, error) {
+	curItemCategory := itemcategory.ItemCategory{
+		Code:   itemCategory.Code,
+		Name:   itemCategory.Name,
+		ActInd: string(itemCategory.ActInd),
+		AuditTrail: shared.AuditTrail{
+			UpdatedBy: identity.FromStringOrNil(itemCategory.UpdatedBy),
+		},
+	}
+
+	err := s.ItemCategoryRepository.Update(ctx, &curItemCategory, itemCategory.Schema)
+	if err != nil {
+		return nil, err
+	}
+
+	return &curItemCategory, nil
+}
+
+func (s *ItemCategory) GetByID(ctx context.Context, id, schema string) (*model.ItemCategoryResponse, error) {
+	itemCategory, err := s.ItemCategoryRepository.GetByID(ctx, id, schema)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := model.ItemCategoryResponse{
+		Code:   itemCategory.Code,
+		Name:   itemCategory.Name,
+		ActInd: model.BinnaryIndicator(itemCategory.ActInd),
+	}
+
+	return &resp, nil
+}

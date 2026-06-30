@@ -1,0 +1,57 @@
+app: seedapp
+app_version: v0.0.1
+env: development
+
+http:
+  port: 8002
+  write_timeout: 30
+  read_timeout: 30
+
+log:
+  file_location: logs
+  file_tdr_location: logs
+  file_max_size: 50 # megabytes
+  file_max_backup: 10
+  file_max_age: 30 # days
+  stdout: true
+
+database:
+  host: 127.0.0.1
+  port: 5432
+  name: accountingplus
+  user: ""
+  password: ""
+  ssl_mode: disable
+  max_idle_conn: 10
+  conn_max_lifetime: 1 # in hours
+  max_open_conn: 100
+
+redis:
+  mode: single # single/sentinel/cluster
+  address: 127.0.0.1
+  port: 6379
+  password: ""
+
+toggle:
+  app_name: seedapp
+  url: https://toronto.runsystemdev.com/api/
+  token: ""
+
+basic_auths: ""
+
+flag_seed_demo_date: 2025-08-13
+
+migrate_tenant_startup: true
+migrate_tenant_per_batch: 100
+
+kokai:
+  url: https://message-dev.runsystemdev.com
+  user: ""
+  password: ""
+  timeout: 180s
+
+scheduler_time:
+  purchase_invoice_routine: 07:00:01
+  sales_invoice_routine: 07:30:01
+  journal_routine: 07:15:01
+  voucher_routine: 07:35:01

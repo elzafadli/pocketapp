@@ -1,0 +1,48 @@
+package rest
+
+import (
+	"testing"
+
+	"seedapp/config"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestFiber_Startup(t *testing.T) {
+	// Create a new instance of the Fiber struct
+	f := &Fiber{
+		Conf: &config.Config{
+			Http: config.HttpConfig{
+				ReadTimeout:  10,
+				WriteTimeout: 10,
+			},
+		},
+	}
+
+	// Call the Startup method
+	err := f.Startup()
+
+	// Assert that there is no error
+	assert.NoError(t, err)
+}
+
+func TestFiber_Shutdown(t *testing.T) {
+	// Create a new instance of the Fiber struct
+	f := &Fiber{
+		Conf: &config.Config{
+			Http: config.HttpConfig{
+				ReadTimeout:  10,
+				WriteTimeout: 10,
+			},
+		},
+	}
+
+	// Call the Startup method
+	err := f.Startup()
+	assert.NoError(t, err)
+
+	// Call the Shutdown method
+	err = f.Shutdown()
+	// Assert that there is no error
+	assert.NoError(t, err)
+}

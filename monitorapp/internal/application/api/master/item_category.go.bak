@@ -1,0 +1,147 @@
+package master
+
+import (
+	model "beru/internal/application/model/master"
+	service "beru/internal/application/service/master"
+	"beru/internal/domain/master"
+	"beru/internal/pkg/custommiddleware"
+	"beru/internal/pkg/formatter"
+	"beru/internal/pkg/validator"
+	"strings"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type ItemCategoryAPI interface {
+	List(c *fiber.Ctx) error
+	Create(c *fiber.Ctx) error
+	GetByID(c *fiber.Ctx) error
+	Update(c *fiber.Ctx) error
+}
+
+type ItemCategoryHandler struct {
+	Validator           validator.Validator         `inject:"validator"`
+	ItemCategoryService service.ItemCategoryService `inject:"itemCategoryServiceLoggable"`
+}
+
+func ItemCategoryRoutes(router fiber.Router, jwtProtection, idempotencyReq fiber.Handler, h ItemCategoryAPI) {
+	router.Get("/item-categories", jwtProtection, h.List)
+	router.Post("/item-categories", jwtProtection, idempotencyReq, h.Create)
+	router.Put("/item-categories/:item_category_code", jwtProtection, idempotencyReq, h.Update)
+	router.Get("/item-categories/:item_category_code", jwtProtection, h.GetByID)
+}
+
+func InternalItemCategoryRoutes(router fiber.Router, middleware custommiddleware.AuthMiddlewareService, h ItemCategoryAPI) {
+	router.Get("/internal/:tenant_code/item-categories", middleware.BasicAuthProtection(), h.List)
+}
+
+func (h *ItemCategoryHandler) List(c *fiber.Ctx) error {
+	var schema string = ""
+	page := uint64(c.QueryInt("page", 1))
+	limit := uint64(c.QueryInt("limit", 10))
+	offset := (page - 1) * limit
+	search := c.Query("search", "")
+	if curschema, ok := c.Locals("tenant_code").(string); ok {
+		schema = curschema
+	} else {
+		schema = c.Params("tenant_code")
+	}
+	isActive := c.QueryBool("is_active", false)
+
+	filter := make(map[string]interface{})
+	filter["limit"] = limit
+	filter["offset"] = offset
+	filter["search"] = search
+	filter["schema"] = schema
+	filter["is_active"] = isActive
+
+	item_categories, metadata, err := h.ItemCategoryService.List(c.Context(), filter)
+	if err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusOK).JSON(formatter.NewSuccessResponseWithMetadata(formatter.Success, item_categories, metadata))
+}
+
+func (h *ItemCategoryHandler) Create(c *fiber.Ctx) error {
+	var req model.CreateItemCategoryRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return err
+	}
+
+	// avoid given empty sting
+	req.Name = strings.TrimSpace(req.Name)
+
+	if !req.IsCodeValid() {
+		return master.ErrInvalidCode
+	}
+
+	req.CreatedBy = c.Locals("user_code").(string)
+	req.Schema = c.Locals("tenant_code").(string)
+
+	if err := h.Validator.Validate(c.Context(), req); err != nil {
+		return err
+	}
+
+	itemCategory, err := h.ItemCategoryService.Create(c.Context(), &req)
+	if err != nil {
+		return err
+	}
+
+	resItemCategory := model.ItemCategoryResponse{
+		Code:   itemCategory.Code,
+		Name:   itemCategory.Name,
+		ActInd: model.BinnaryIndicator(itemCategory.ActInd),
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(formatter.NewSuccessResponse(formatter.Success, resItemCategory))
+
+}
+
+func (h *ItemCategoryHandler) GetByID(c *fiber.Ctx) error {
+	ItCtCode := c.Params("item_category_code")
+
+	schema := c.Locals("tenant_code").(string)
+
+	itemCategory, err := h.ItemCategoryService.GetByID(c.Context(), ItCtCode, schema)
+	if err != nil {
+		return err
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(formatter.NewSuccessResponse(formatter.Success, itemCategory))
+}
+
+func (h *ItemCategoryHandler) Update(c *fiber.Ctx) error {
+	var req model.UpdateItemCategoryRequest
+
+	if err := c.BodyParser(&req); err != nil {
+		return err
+	}
+
+	req.Code = c.Params("item_category_code")
+
+	// avoid given empty sting
+	req.Name = strings.TrimSpace(req.Name)
+
+	req.UpdatedBy = c.Locals("user_code").(string)
+	req.Schema = c.Locals("tenant_code").(string)
+
+	if err := h.Validator.Validate(c.Context(), req); err != nil {
+		return err
+	}
+
+	itemCategory, err := h.ItemCategoryService.Update(c.Context(), &req)
+	if err != nil {
+		return err
+	}
+
+	resItemCategory := model.ItemCategoryResponse{
+		Code:   itemCategory.Code,
+		Name:   itemCategory.Name,
+		ActInd: model.BinnaryIndicator(itemCategory.ActInd),
+	}
+
+	return c.Status(fiber.StatusCreated).JSON(formatter.NewSuccessResponse(formatter.Success, resItemCategory))
+
+}

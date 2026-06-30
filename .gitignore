@@ -1,0 +1,27 @@
+# Logs
+logs/
+*.log
+
+# Dependency directories
+node_modules/
+
+# IDE and OS files
+.idea/
+.DS_Store
+.vscode/
+
+# Environment variables
+.env
+.env.local
+
+# Test / Mock files
+mocks/
+
+# Binaries and executables
+bin/
+*.out
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib

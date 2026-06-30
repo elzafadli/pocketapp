@@ -1,0 +1,56 @@
+app: pakuningratan
+app_version: v0.0.1
+env: development
+
+http:
+  port: 8003
+  write_timeout: 30
+  read_timeout: 30
+
+grpc:
+  port: 9001
+  activity_log_addr: "localhost:9002"
+
+log:
+  file_location: "logs"
+  file_tdr_location: "logs"
+  file_max_size: 20 # megabytes
+  file_max_backup: 10 # number of backups
+  file_max_age: 30 # days
+  stdout: true
+
+database:
+  host: 127.0.0.1
+  port: 5432
+  name: pakuningratan
+  user: ""
+  password: ""
+  ssl_mode: disable
+  max_idle_conn: 10
+  conn_max_lifetime: 1h
+  max_open_conn: 100
+
+redis:
+  mode: single # single/sentinel/cluster
+  address: 127.0.0.1
+  port: 6379
+  password: ""
+
+basic_auths: user:password,user2:password2
+internal_api_key: changemeinprod
+jwt_secret: "my_super_secret_key"
+
+kaisel:
+  url: "http://localhost:8002"
+  timeout: "30s"
+  user: "kaisel"
+  password: "changeinproduction"
+
+monitor:
+  url: "http://localhost:8004"
+  timeout: "30s"
+  user: "user"
+  password: "password"
+
+agent:
+  url: "http://localhost:3000"
