@@ -10,20 +10,19 @@ Pengerjaan fase ini difokuskan pada penyelesaian arsitektur core-domain, perbaik
 
 ### **Berhasil Diimplementasikan (Completed)**
 
-1. **Pocket Items CRUD (Core Features)**: 
-   Sistem kini telah mendukung operasi penuh untuk manajemen konten saku (Create, Read, Update, Delete). Fitur ini dilengkapi mekanisme *Soft-Delete* agar data tidak terhapus total dari sistem melainkan hanya diarsipkan. Selain itu, fungsionalitas *Search* dan *Filter* (termasuk validasi kondisional URL yang bergantung pada tipe konten) beroperasi optimal dengan bantuan *query builder* Squirrel.
-   
-2. **AI-Powered Pocket Summarization**: 
-   Integrasi dengan layanan AI (*LangGraph*) melalui endpoint `/pockets/:id/summarize` telah direalisasikan. Fitur *smart summary* ini memungkinkan pengguna untuk mengekstrak intisari dari sebuah artikel, video, atau dokumen panjang secara instan untuk mempercepat proses pencernaan informasi.
+1. **Pocket Items CRUD (Core Features)**:
+   Sistem kini telah mendukung operasi penuh untuk manajemen konten saku (Create, Read, Update, Delete). Fitur ini dilengkapi mekanisme _Soft-Delete_ agar data tidak terhapus total dari sistem melainkan hanya diarsipkan. Selain itu, fungsionalitas _Search_ dan _Filter_ (termasuk validasi kondisional URL yang bergantung pada tipe konten) beroperasi optimal dengan bantuan _query builder_ Squirrel.
+2. **AI-Powered Pocket Summarization**:
+   Integrasi dengan layanan AI (_LangGraph_) melalui endpoint `/pockets/:id/summarize` telah direalisasikan. Fitur _smart summary_ ini memungkinkan pengguna untuk mengekstrak intisari dari sebuah artikel, video, atau dokumen panjang secara instan untuk mempercepat proses pencernaan informasi.
 
-3. **Standardisasi Error & Response Model (Shared Domain)**: 
-   Meminimalisir redundansi kode (*DRY*) di berbagai *service* dengan mengekstrak definisi struct error (seperti `ValidationErrorDetail`, `ValidationErrorResponse`) ke dalam *package* tunggal `internal/domain/shared`. Konstanta spesifik domain (contoh: `POCKET_NOT_FOUND`) juga dihadirkan untuk meningkatkan presisi pemetaan HTTP Status pada Middleware.
+3. **Standardisasi Error & Response Model (Shared Domain)**:
+   Meminimalisir redundansi kode (_DRY_) di berbagai _service_ dengan mengekstrak definisi struct error (seperti `ValidationErrorDetail`, `ValidationErrorResponse`) ke dalam _package_ tunggal `internal/domain/shared`. Konstanta spesifik domain (contoh: `POCKET_NOT_FOUND`) juga dihadirkan untuk meningkatkan presisi pemetaan HTTP Status pada Middleware.
 
-4. **Payload Contract Consistency & Auth Routes**: 
-   Menyelaraskan *response payload* untuk endpoint otentikasi. Endpoint API *Login* (`userapp`) telah diperbarui agar selalu mengembalikan *Auth Token (JWT)* bersamaan dengan profil *User*. Di samping itu, fungsionalitas pendaftaran (`/register` dengan *API Key protection*) berhasil diintegrasikan langsung ke dalam rute API utama.
+4. **Payload Contract Consistency & Auth Routes**:
+   Menyelaraskan _response payload_ untuk endpoint otentikasi. Endpoint API _Login_ (`userapp`) telah diperbarui agar selalu mengembalikan _Auth Token (JWT)_ bersamaan dengan profil _User_. Di samping itu, fungsionalitas pendaftaran (`/register` dengan _API Key protection_) berhasil diintegrasikan langsung ke dalam rute API utama.
 
-5. **Cross-Platform Test Coverage Checking (Windows Support)**: 
-   Menulis ulang logika tahap validasi minimum *test coverage* pada perintah *Makefile*. Ketergantungan sistem terhadap *shell commands* Unix/Linux (`tr`, `grep`, `awk`, `sed`) dihilangkan secara menyeluruh dan digantikan dengan program *native Golang* (`scripts/coverage.go`). Inovasi ini menjamin kapabilitas eksekusi di environment Windows (PowerShell/CMD) tanpa harus meng-install *tools* tambahan.
+5. **Cross-Platform Test Coverage Checking (Windows Support)**:
+   Menulis ulang logika tahap validasi minimum _test coverage_ pada perintah _Makefile_. Ketergantungan sistem terhadap _shell commands_ Unix/Linux (`tr`, `grep`, `awk`, `sed`) dihilangkan secara menyeluruh dan digantikan dengan program _native Golang_ (`scripts/coverage.go`). Inovasi ini menjamin kapabilitas eksekusi di environment Windows (PowerShell/CMD) tanpa harus meng-install _tools_ tambahan.
 
 ### **Belum Berhasil / Next Milestone (Pending)**
 
@@ -59,10 +58,7 @@ Dalam penyelesaian tiket, asisten AI (Antigravity) digunakan secara proaktif unt
 
 ## 7. Link Recording Proses Pengerjaan
 
-_(Bagian ini dapat diisi dengan tautan ke rekaman demonstrasi video tim atau rekap sesi log percakapan AI jika dikelola secara terpusat)_
-
-- **Demo Eksekusi:** [Masukan Link Video Recording / Screen Capture]
-- **Session ID Log AI:** `a0883865-1ae6-442a-92e5-3b4fb214945d`
+- **Demo Eksekusi:** https://youtu.be/teNi3wBIu3s
 
 ## 8. Improvement Plan
 
