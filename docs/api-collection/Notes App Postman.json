@@ -1,0 +1,701 @@
+{
+  "info": {
+    "name": "Notes App",
+    "description": null,
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Migration Service",
+      "item": [
+        {
+          "name": "Create Tenant",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "basic",
+              "basic": [
+                {
+                  "key": "password",
+                  "value": "changeinproduction",
+                  "type": "string"
+                },
+                {
+                  "key": "username",
+                  "value": "kaisel",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:8002/v1/migrate",
+              "protocol": "http",
+              "host": [
+                "localhost:8002"
+              ],
+              "path": [
+                "v1",
+                "migrate"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"schemas\": [\r\n    \"98765432-1234-abcd-ef01-123456789abc\"\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Service",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Register",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  },
+                  {
+                    "key": "X-Api-Key",
+                    "value": "changemeinprod",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "{{pocket_url}}/api/auth/register",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "register"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Test User 6\",\n  \"email\": \"test5@example.com\",\n  \"password\": \"secret123\",\n  \"tenant_name\": \"Tenant Test 6\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Login",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  },
+                  {
+                    "key": "X-Api-Key",
+                    "value": "changemeinprod",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "noauth"
+                },
+                "description": "",
+                "url": {
+                  "raw": "{{pocket_url}}/api/auth/login",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "auth",
+                    "login"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"test6@example.com\",\n  \"password\": \"secret123\",\n  \"time_zone\": \"Asia/Jakarta\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {},
+                    "exec": [
+                      "let data = pm.response.json();",
+                      "",
+                      "if (data != null && data.data) {",
+                      "  pm.environment.set(\"access_token\", data.data.token);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Pocket",
+          "item": [
+            {
+              "name": "Create",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n\n```\n{\n  \"data\": {\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n    \"title\": \"React Performance Guide\",\n    \"url\": \"https://example.com/react-performance\",\n    \"description\": \"A guide about React rendering optimization\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": false,\n    \"tags\": [\n      \"frontend\",\n      \"react\"\n    ],\n    \"createdAt\": \"2026-06-30T09:25:03.6998811+07:00\",\n    \"updatedAt\": \"2026-06-30T09:25:03.6998811+07:00\"\n  },\n  \"message\": \"Pocket item created successfully\"\n}\n```\n\nValidation Error Title:\n```\n{\n  \"code\": \"VALIDATION_ERROR\",\n  \"message\": \"Validation error\",\n  \"details\": [\n    {\n      \"field\": \"Title\",\n      \"message\": \"Title is a required field\"\n    }\n  ]\n}\n```\n\nValidation Error URL invalid:\n```\n{\n  \"code\": \"VALIDATION_ERROR\",\n  \"message\": \"Validation error\",\n  \"details\": [\n    {\n      \"field\": \"url\",\n      \"message\": \"URL is invalid\"\n    }\n  ]\n}\n```",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Astro Bots\",\n  \"url\": \"thatgamingfeeling.com/p/astro-bot-review-a-wholesome-adventure\",\n  \"description\": \"Heartwarming Tribute to PlayStation's History\",\n  \"contentType\": \"article\",\n  \"tags\": [\n    \"gaming\"\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "List",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n```\n{\n  \"data\": [\n    {\n      \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n      \"title\": \"React Performance Guide\",\n      \"url\": \"https://example.com/react-performance\",\n      \"description\": \"A guide about React rendering optimization\",\n      \"contentType\": \"article\",\n      \"status\": \"unread\",\n      \"isFavorite\": false,\n      \"tags\": [\n        \"frontend\",\n        \"react\"\n      ],\n      \"createdAt\": \"2026-06-30T09:25:03.699881+07:00\",\n      \"updatedAt\": \"2026-06-30T09:25:03.699881+07:00\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 1,\n    \"totalPage\": 1\n  }\n}\n```\n\nError Token:\n```\n{\n  \"status\": \"PAKU07\",\n  \"message\": \"auth: invalid token\",\n  \"traceId\": \"3001392a-f272-4879-8838-59dfca9c6eb1\"\n}\n```\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets?page=1&limit=10&sort=createdAt:desc",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets?page=1&limit=10&sort=createdAt:desc"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "TypeScript"
+                    },
+                    {
+                      "key": "status",
+                      "value": "archived"
+                    },
+                    {
+                      "key": "type",
+                      "value": "note"
+                    },
+                    {
+                      "key": "favorite",
+                      "value": "true"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    },
+                    {
+                      "key": "sort",
+                      "value": "createdAt:desc"
+                    }
+                  ],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n{\n  \"data\": {\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n    \"title\": \"React Performance Guide\",\n    \"url\": \"https://example.com/react-performance\",\n    \"description\": \"A guide about React rendering optimization\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": false,\n    \"tags\": [\n      \"frontend\",\n      \"react\"\n    ],\n    \"createdAt\": \"2026-06-30T09:25:03.6998811+07:00\",\n    \"updatedAt\": \"2026-06-30T09:25:03.6998811+07:00\"\n  },\n  \"message\": \"Pocket item created successfully\"\n}\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/019f1c17-0e39-79d6-ae7e-f17462edacc6",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "019f1c17-0e39-79d6-ae7e-f17462edacc6"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n   \"title\": \"Astro Bots\",\n    \"url\": \"https://www.thatgamingfeeling.com/p/astro-bot-review-a-wholesome-adventure\",\n    \"description\": \"Heartwarming Tribute to PlayStation's History\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": true,\n    \"tags\": [\n      \"gaming\",\"coding\"\n    ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Detail",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n{\n  \"data\": {\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n    \"title\": \"React Performance Guide\",\n    \"url\": \"https://example.com/react-performance\",\n    \"description\": \"A guide about React rendering optimization\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": false,\n    \"tags\": [\n      \"frontend\",\n      \"react\"\n    ],\n    \"createdAt\": \"2026-06-30T09:25:03.6998811+07:00\",\n    \"updatedAt\": \"2026-06-30T09:25:03.6998811+07:00\"\n  },\n  \"message\": \"Pocket item created successfully\"\n}\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/10000000-0000-0000-0000-000000000001",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "10000000-0000-0000-0000-000000000001"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Summarize",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n\nError:\n```\n{\n  \"code\": \"INTERNAL_SERVER_ERROR\",\n  \"message\": \"{\\\"error\\\":\\\"Failed to fetch URL: Not Found\\\"}\"\n}\n```\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/10000000-0000-0000-0000-000000000001/summarize",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "10000000-0000-0000-0000-000000000001",
+                    "summarize"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Delete",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n{\n  \"data\": {\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n    \"title\": \"React Performance Guide\",\n    \"url\": \"https://example.com/react-performance\",\n    \"description\": \"A guide about React rendering optimization\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": false,\n    \"tags\": [\n      \"frontend\",\n      \"react\"\n    ],\n    \"createdAt\": \"2026-06-30T09:25:03.6998811+07:00\",\n    \"updatedAt\": \"2026-06-30T09:25:03.6998811+07:00\"\n  },\n  \"message\": \"Pocket item created successfully\"\n}\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/019f1658-26d3-7d71-a170-f8459e1d7e9c",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "019f1658-26d3-7d71-a170-f8459e1d7e9c"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update Favorite",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n{\n  \"data\": {\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n    \"title\": \"React Performance Guide\",\n    \"url\": \"https://example.com/react-performance\",\n    \"description\": \"A guide about React rendering optimization\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": false,\n    \"tags\": [\n      \"frontend\",\n      \"react\"\n    ],\n    \"createdAt\": \"2026-06-30T09:25:03.6998811+07:00\",\n    \"updatedAt\": \"2026-06-30T09:25:03.6998811+07:00\"\n  },\n  \"message\": \"Pocket item created successfully\"\n}\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/019f1c17-0e39-79d6-ae7e-f17462edacc6/favorite",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "019f1c17-0e39-79d6-ae7e-f17462edacc6",
+                    "favorite"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"isFavorite\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Update Status",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n{\n  \"data\": {\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n    \"title\": \"React Performance Guide\",\n    \"url\": \"https://example.com/react-performance\",\n    \"description\": \"A guide about React rendering optimization\",\n    \"contentType\": \"article\",\n    \"status\": \"unread\",\n    \"isFavorite\": false,\n    \"tags\": [\n      \"frontend\",\n      \"react\"\n    ],\n    \"createdAt\": \"2026-06-30T09:25:03.6998811+07:00\",\n    \"updatedAt\": \"2026-06-30T09:25:03.6998811+07:00\"\n  },\n  \"message\": \"Pocket item created successfully\"\n}\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/019f1c17-0e39-79d6-ae7e-f17462edacc6/status",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "019f1c17-0e39-79d6-ae7e-f17462edacc6",
+                    "status"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"read\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "Summary",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "disabled": false,
+                    "type": "default"
+                  }
+                ],
+                "auth": {
+                  "type": "bearer",
+                  "bearer": {
+                    "key": "token",
+                    "value": "{{access_token}}",
+                    "type": "string"
+                  }
+                },
+                "description": "Success:\n```\n{\n  \"data\": [\n    {\n      \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\n      \"title\": \"React Performance Guide\",\n      \"url\": \"https://example.com/react-performance\",\n      \"description\": \"A guide about React rendering optimization\",\n      \"contentType\": \"article\",\n      \"status\": \"unread\",\n      \"isFavorite\": false,\n      \"tags\": [\n        \"frontend\",\n        \"react\"\n      ],\n      \"createdAt\": \"2026-06-30T09:25:03.699881+07:00\",\n      \"updatedAt\": \"2026-06-30T09:25:03.699881+07:00\"\n    }\n  ],\n  \"meta\": {\n    \"page\": 1,\n    \"limit\": 10,\n    \"total\": 1,\n    \"totalPage\": 1\n  }\n}\n```\n\nError Token:\n```\n{\n  \"status\": \"PAKU07\",\n  \"message\": \"auth: invalid token\",\n  \"traceId\": \"3001392a-f272-4879-8838-59dfca9c6eb1\"\n}\n```\n\n",
+                "url": {
+                  "raw": "{{pocket_url}}/api/pockets/summary",
+                  "protocol": "",
+                  "host": [
+                    "{{pocket_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "pockets",
+                    "summary"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Agent Service",
+      "item": [
+        {
+          "name": "Summarize",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "disabled": false,
+                "type": "default"
+              }
+            ],
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "",
+            "url": {
+              "raw": "http://localhost:3000/summarize",
+              "protocol": "http",
+              "host": [
+                "localhost:3000"
+              ],
+              "path": [
+                "summarize"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"data\": {\r\n    \"id\": \"019f1658-26d3-7d71-a170-f8459e1d7e9c\",\r\n    \"title\": \"React Performance Guide\",\r\n    \"url\": \"https://react.dev/learn/render-and-commit\",\r\n    \"description\": \"A guide about React rendering optimization\",\r\n    \"contentType\": \"article\",\r\n    \"status\": \"archived\",\r\n    \"isFavorite\": false,\r\n    \"tags\": [\r\n      \"frontend\",\r\n      \"react\"\r\n    ],\r\n    \"createdAt\": \"2026-06-30T09:25:03.699881+07:00\",\r\n    \"updatedAt\": \"2026-06-30T09:46:56.173053+07:00\"\r\n  }\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "pocket_url",
+      "value": "",
+      "type": "default"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "default"
+    }
+  ]
+}
