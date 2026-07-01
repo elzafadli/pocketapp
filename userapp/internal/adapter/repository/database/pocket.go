@@ -151,3 +151,20 @@ func (r *PocketRepository) Count(ctx context.Context, schema string, filter map[
 
 	return count, nil
 }
+
+func (r *PocketRepository) GetSummary(ctx context.Context, schema string) (*pocket.PocketSummary, error) {
+	query, args, err := r.Querier.GetSummary(schema)
+	if err != nil {
+		golog.Error(ctx, fmt.Sprintf("Error build query get summary pocket: %s", err.Error()), err)
+		return nil, pocket.ErrDataGet
+	}
+
+	var summary pocket.PocketSummary
+	err = r.DB.GetDB().GetContext(ctx, &summary, query, args...)
+	if err != nil {
+		golog.Error(ctx, fmt.Sprintf("Error get summary pocket: %s", err.Error()), err)
+		return nil, pocket.ErrDataGet
+	}
+
+	return &summary, nil
+}

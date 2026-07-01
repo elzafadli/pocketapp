@@ -17,6 +17,7 @@ type PocketQuerier interface {
 	Delete(schema string, id string, archivedAt interface{}) (string, []interface{}, error)
 	List(schema string, filter map[string]interface{}) (string, []interface{}, error)
 	Count(schema string, filter map[string]interface{}) (string, []interface{}, error)
+	GetSummary(schema string) (string, []interface{}, error)
 }
 
 type Pocket struct {
@@ -102,6 +103,20 @@ func (q *Pocket) Count(schema string, filter map[string]interface{}) (string, []
 	sql = q.applyFilters(sql, filter)
 
 	return sql.ToSql()
+}
+
+func (q *Pocket) GetSummary(schema string) (string, []interface{}, error) {
+	return q.SQLBuilder.
+		Select(
+			"COUNT(1) AS total_items",
+			"COALESCE(SUM(CASE WHEN status = 'unread' AND archived_at IS NULL THEN 1 ELSE 0 END), 0) AS unread_items",
+			"COALESCE(SUM(CASE WHEN status = 'reading' AND archived_at IS NULL THEN 1 ELSE 0 END), 0) AS reading_items",
+			"COALESCE(SUM(CASE WHEN status = 'read' AND archived_at IS NULL THEN 1 ELSE 0 END), 0) AS read_items",
+			"COALESCE(SUM(CASE WHEN status = 'archived' OR archived_at IS NOT NULL THEN 1 ELSE 0 END), 0) AS archived_items",
+			"COALESCE(SUM(CASE WHEN is_favorite = TRUE AND archived_at IS NULL THEN 1 ELSE 0 END), 0) AS favorite_items",
+		).
+		From(TenantTableSchema(schema, POCKET_ITEM_TABLE)).
+		ToSql()
 }
 
 func (q *Pocket) applyFilters(sql sq.SelectBuilder, filter map[string]interface{}) sq.SelectBuilder {

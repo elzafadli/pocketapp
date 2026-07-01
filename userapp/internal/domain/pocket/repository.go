@@ -14,4 +14,5 @@ type Repository interface {
 	Delete(ctx context.Context, schema string, id identity.ID) error
 	List(ctx context.Context, schema string, filter map[string]interface{}) ([]*PocketItem, error)
 	Count(ctx context.Context, schema string, filter map[string]interface{}) (uint64, error)
+	GetSummary(ctx context.Context, schema string) (*PocketSummary, error)
 }

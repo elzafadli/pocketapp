@@ -20,6 +20,7 @@ type PocketService interface {
 	UpdateStatus(ctx context.Context, schema string, id identity.ID, status string) (*pocket.PocketItem, error)
 	ToggleFavorite(ctx context.Context, schema string, id identity.ID, favorite bool) (*pocket.PocketItem, error)
 	Summarize(ctx context.Context, schema string, id identity.ID) (*agent.SummaryResponse, error)
+	GetSummary(ctx context.Context, schema string) (*pocket.PocketSummary, error)
 }
 
 type Pocket struct {
@@ -165,4 +166,8 @@ func (s *Pocket) ToggleFavorite(ctx context.Context, schema string, id identity.
 	}
 
 	return item, nil
+}
+
+func (s *Pocket) GetSummary(ctx context.Context, schema string) (*pocket.PocketSummary, error) {
+	return s.PocketRepo.GetSummary(ctx, schema)
 }

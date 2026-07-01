@@ -24,6 +24,7 @@ type PocketAPI interface {
 	UpdateStatus(*fiber.Ctx) error
 	ToggleFavorite(*fiber.Ctx) error
 	Summarize(*fiber.Ctx) error
+	GetSummary(*fiber.Ctx) error
 }
 
 type PocketHandler struct {
@@ -33,6 +34,7 @@ type PocketHandler struct {
 
 func PocketRoutes(router fiber.Router, authMiddleware custommiddleware.AuthMiddlewareService, h PocketAPI) {
 	router.Get("/pockets", authMiddleware.JwtProtection(), h.Get)
+	router.Get("/pockets/summary", authMiddleware.JwtProtection(), h.GetSummary)
 	router.Post("/pockets", authMiddleware.JwtProtection(), h.Create)
 	router.Get("/pockets/:id", authMiddleware.JwtProtection(), h.Detail)
 	router.Put("/pockets/:id", authMiddleware.JwtProtection(), h.Update)
@@ -332,5 +334,19 @@ func (h *PocketHandler) Summarize(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"data":    summary,
 		"message": "Summary generated successfully",
+	})
+}
+
+func (h *PocketHandler) GetSummary(c *fiber.Ctx) error {
+	schema := tenantSchema(c)
+
+	res, err := h.Service.GetSummary(c.Context(), schema)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(formatter.NewInternalErrorResponse(err.Error()))
+	}
+
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"data":    res,
+		"message": "Dashboard summary retrieved successfully",
 	})
 }

@@ -166,6 +166,23 @@ func (suite *PocketServiceSuite) TestToggleFavorite_Success() {
 	suite.True(result.IsFavorite)
 }
 
+func (suite *PocketServiceSuite) TestGetSummary_Success() {
+	expectedSummary := &pocket.PocketSummary{
+		TotalItems:    150,
+		UnreadItems:   50,
+		ReadingItems:  20,
+		ReadItems:     70,
+		ArchivedItems: 10,
+		FavoriteItems: 35,
+	}
+
+	suite.mockRepo.EXPECT().GetSummary(suite.ctx, "public").Return(expectedSummary, nil)
+
+	result, err := suite.pocketSvc.GetSummary(suite.ctx, "public")
+	suite.NoError(err)
+	suite.Equal(expectedSummary, result)
+}
+
 func TestPocketService(t *testing.T) {
 	suite.Run(t, new(PocketServiceSuite))
 }

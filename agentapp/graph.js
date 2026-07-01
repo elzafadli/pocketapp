@@ -60,8 +60,8 @@ async function processContent(state) {
 
     const systemPrompt = `You are a helpful assistant. You have been given the contents of a webpage and some metadata about it.
 Your task is to:
-1. Provide a concise summary of the webpage.
-2. Extract a structured TO-DO list based on the content (e.g. actions the user should take after reading).
+1. Provide a concise summary of the webpage in Indonesian (Bahasa Indonesia).
+2. Extract a structured TO-DO list in Indonesian (Bahasa Indonesia) based on the content (e.g. actions the user should take after reading).
 
 Respond ONLY with a JSON object in the following format:
 {

@@ -81,6 +81,16 @@ type PocketListResponse struct {
 	Meta shared.MetaResponse `json:"meta"`
 }
 
+type PocketSummary struct {
+	TotalItems    int64 `db:"total_items" json:"totalItems"`
+	UnreadItems   int64 `db:"unread_items" json:"unreadItems"`
+	ReadingItems  int64 `db:"reading_items" json:"readingItems"`
+	ReadItems     int64 `db:"read_items" json:"readItems"`
+	ArchivedItems int64 `db:"archived_items" json:"archivedItems"`
+	FavoriteItems int64 `db:"favorite_items" json:"favoriteItems"`
+}
+
+
 type PocketListQuery struct {
 	Search      string
 	Status      string
