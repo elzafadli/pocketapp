@@ -101,7 +101,7 @@ _Catatan: Sistem pengecekan coverage ditulis menggunakan script Go murni (`scrip
 
 ## 8. Link Recording Proses Pengerjaan
 
-- **Session ID Log AI (Antigravity):** `a0883865-1ae6-442a-92e5-3b4fb214945d` (Referensi dari laporan akhir).
+- **Demo Eksekusi:** https://youtu.be/teNi3wBIu3s
 
 ## 9. Tools AI yang Digunakan
 
